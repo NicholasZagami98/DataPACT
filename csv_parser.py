@@ -6,13 +6,12 @@ from iterator import DataIterator
 
 
 class CsvExporter:
-    """Processore batch per elaborare più file HTML"""
+    """Class to export legal document data into CSV files."""
 
     def __init__(self, documents_config):
         self.documents_config = documents_config
 
     def process_all(self, output_dir='csv_output'):
-        """Processa tutti i documenti e genera i CSV consolidati"""
         os.makedirs(output_dir, exist_ok=True)
         all_data = []
 

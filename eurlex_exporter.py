@@ -198,11 +198,8 @@ class EURLexHTMLParser:
 
         for recital_div in recital_divs:
             recital_id = recital_div.get('id')
-
-            # Extract recital number from id (e.g., "rct_173" -> "173")
             recital_num = recital_id.replace('rct_', '')
 
-            # Extract text from all paragraphs within the recital
             text_parts = []
             for p in recital_div.find_all('p', class_='oj-normal'):
                 text_parts.append(p.get_text(separator=' ', strip=True))
