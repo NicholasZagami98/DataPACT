@@ -23,7 +23,8 @@ class CsvExporter:
                     author=config['author'],
                     publication_date=config['publication_date'],
                     date_of_application=config['date_of_application'],
-                    eurolex_url=config['eurolex_url']
+                    eurolex_url=config['eurolex_url'],
+                    document_info_url=config['document_info_url']
                 )
                 all_data.append(exporter.extract_data())
             except Exception as e:
@@ -59,6 +60,9 @@ class CsvExporter:
         self._write_article_paragraph_relations(all_data, output_dir)
         self._write_act_recital_relations(all_data, output_dir)
         self._write_citations(all_data, output_dir)
+        self._write_case_law_article_relations(all_data, output_dir)
+        self._write_case_law_paragraph_relations(all_data, output_dir)
+        self._write_case_law_chapter_relations(all_data, output_dir)
 
     def _write_acts(self, all_data, output_dir):
         iterator = DataIterator(all_data)
@@ -190,3 +194,51 @@ class CsvExporter:
                 f"{act['celex']}{recital['id']}"
             ])
         self._write_csv('act_has_recital.csv', ['from_celex', 'to_recital_id'], rows, output_dir)
+
+    def _write_case_law_paragraph_relations(self, all_data, output_dir):
+        iterator = DataIterator(all_data)
+        rows = []
+
+        for act, data in iterator.iter_acts():
+            for case_law in data.get('case_law', []):
+                if case_law.get('paragraph'):
+                    rows.append([
+                        case_law['case_law_identifier'],
+                        f"{act['celex']}_{case_law['paragraph']}"
+                    ])
+
+        self._write_csv('case_law_interprets_paragraph.csv',
+                        ['from_case_law_id', 'to_paragraph_id'],
+                        rows, output_dir)
+
+    def _write_case_law_article_relations(self, all_data, output_dir):
+        iterator = DataIterator(all_data)
+        rows = []
+
+        for act, data in iterator.iter_acts():
+            for case_law in data.get('case_law', []):
+                if case_law.get('article') and not case_law.get('paragraph'):
+                    rows.append([
+                        case_law['case_law_identifier'],
+                        f"{act['celex']}{case_law['article']}"
+                    ])
+
+        self._write_csv('case_law_interprets_article.csv',
+                        ['from_case_law_id', 'to_article_id'],
+                        rows, output_dir)
+
+    def _write_case_law_chapter_relations(self, all_data, output_dir):
+        iterator = DataIterator(all_data)
+        rows = []
+
+        for act, data in iterator.iter_acts():
+            for case_law in data.get('case_law', []):
+                if case_law.get('chapter') and not case_law.get('paragraph') and not case_law.get('article'):
+                    rows.append([
+                        case_law['case_law_identifier'],
+                        f"{act['celex']}{case_law['chapter']}"
+                    ])
+
+        self._write_csv('case_law_interprets_chapter.csv',
+                        ['from_case_law_id', 'to_chapter_id'],
+                        rows, output_dir)

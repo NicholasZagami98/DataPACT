@@ -1,12 +1,13 @@
 import re
 
 from bs4 import BeautifulSoup
+from service.document_info_extractor import DocumentInformationExtractor
 
 
 class EURLexHTMLParser:
     """EURLex HTML parser to extract structured data from legal documents."""
 
-    def __init__(self, html_file_path, celex, author, publication_date, date_of_application, eurolex_url):
+    def __init__(self, html_file_path, celex, author, publication_date, date_of_application, eurolex_url, document_info_url):
         with open(html_file_path, 'r', encoding='utf-8') as f:
             self.soup = BeautifulSoup(f.read(), 'html.parser')
 
@@ -15,6 +16,7 @@ class EURLexHTMLParser:
         self.publication_date = publication_date
         self.date_of_application = date_of_application
         self.eurolex_url = eurolex_url
+        self.document_info_url = document_info_url
 
     def extract_data(self):
         """Extract structured data from the HTML document"""
@@ -22,6 +24,7 @@ class EURLexHTMLParser:
         chapters_data = self._get_chapters()
         recitals_data = self._get_recitals()
         citations = self._extract_citations(chapters_data)
+        case_law = self._get_case_law()
 
         return {
             'act': {
@@ -34,7 +37,8 @@ class EURLexHTMLParser:
             },
             'chapters': chapters_data,
             'recitals': recitals_data,
-            'citations': citations
+            'citations': citations,
+            'case_law': case_law
         }
 
     def _extract_citations(self, chapters_data):
@@ -211,3 +215,9 @@ class EURLexHTMLParser:
             })
 
         return recitals
+
+    def _get_case_law(self):
+        """Extract case law information from the document"""
+        extractor = DocumentInformationExtractor()
+        return extractor.extract_document_info_sections(self.document_info_url)
+
