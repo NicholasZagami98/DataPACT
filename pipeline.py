@@ -1,5 +1,4 @@
 import os
-
 from csv_parser import CsvExporter
 
 documents = [

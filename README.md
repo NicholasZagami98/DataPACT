@@ -1,4 +1,4 @@
-# Legal KG V1
+# Legal KG V1.1
 ## Document assumption
 The following knowledge graph is evaluated based on the Eurolex document structure. In particular, the following assumptions were considered:
 * Each **act** is composed of one or more **chapters**
@@ -75,38 +75,6 @@ topic_name: String
 ```
 
 ## Document Parsing and Data Retrieval
-Eurolex continues to be the primary source for data retrieval; information must be extracted from documents that can be retrieved in HTML format (and parsed in the preferred format).
+All the data used to fill the KG is retrieved from EUR-Lex documents. In particular, specific acts are parsed from the English HTML format into a specific structured data object. Furthermore, the document information section is parsed to match the associated case law. 
 
-
-## Extractions
-![visualisation (8)](https://hackmd.io/_uploads/r1oAqbM-bg.png)
-```sql
-MATCH p1 = (act:Act)-[:CONTAINS]->(chapter1:Chapter),
-      p2 = (act)-[:CONTAINS]->(chapter2:Chapter),
-      p3 = (act)-[:CONTAINS*1..2]->(section:Section),
-      p4 = (section)-[:CONTAINS]->(article:Article),
-      p5 = (article)-[:CONTAINS]->(paragraph:Paragraph)
-WHERE chapter1 <> chapter2
-
-WITH p1, p2, p3, p4, p5, article
-MATCH p6 = (article)-[:CITES]->(cited_article:Article)
-WHERE cited_article.article_id IN ['32016R0679art_6', '32016R0679art_9', '32016R0679art_22', '32016R0679art_46']
-
-RETURN p1, p2, p3, p4, p5, p6
-LIMIT 20
-```
-This extract illustrates the entire Eurolex document tree, beginning with the **act**, which is then divided into **chapters** (identified with *Roman numerals*).
-The **sections** are "optional"; in this example, they are present and contain the **article** and its **paragraphs**. Finally, we also note the presence of a *CITES* relationship to Article 22 cited in Article 12.
-
----
-![visualisation (9)](https://hackmd.io/_uploads/B1NhobGZ-g.png)
-
-```sql
-MATCH (act:Act {celex: '32016R0679'})
-MATCH (act)-[:CONTAINS]->(chapter:Chapter)
-WITH act, chapter
-ORDER BY chapter.chapter_number
-LIMIT 1
-MATCH path = (act)-[:CONTAINS]->(chapter)-[:CONTAINS*1..3]->(node)
-RETURN path
-```
+PS: The parser ignores ongoing case law; we only consider completed case law. (XXX interprets YYY).
