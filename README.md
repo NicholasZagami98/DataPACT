@@ -61,17 +61,11 @@ text: String
 ```
 case_id: String           #C-594/25
 case_title: String
-referring_court: String
+court: String
 curia_url: String
 lodged_date: Datetime
 appellant: String
 respondent: String
-```
-
-### Topic
-```
-id: Integer
-topic_name: String
 ```
 
 ## Document Parsing and Data Retrieval
