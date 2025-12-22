@@ -1,7 +1,7 @@
 import re
 
 from bs4 import BeautifulSoup
-from service.document_info_extractor import DocumentInformationExtractor
+from service.metadata_parser import MetadataParser
 
 
 class EURLexHTMLParser:
@@ -159,11 +159,14 @@ class EURLexHTMLParser:
             article_id = article_div.get('id')
             article_number_p = article_div.find('p', class_='oj-ti-art')
 
+            full_text = ' '.join(article_div.stripped_strings)
+
             articles.append({
                 'id': article_id,
                 'number': article_number_p.get_text(strip=True) if article_number_p else None,
                 'title': self._get_article_title(article_div, article_id),
-                'paragraphs': self._get_paragraphs(article_div, article_id)
+                'paragraphs': self._get_paragraphs(article_div, article_id),
+                'full_text': full_text
             })
 
         return articles
@@ -218,6 +221,6 @@ class EURLexHTMLParser:
 
     def _get_case_law(self):
         """Extract case law information from the document"""
-        extractor = DocumentInformationExtractor()
-        return extractor.extract_document_info_sections(self.document_info_url)
+        extractor = MetadataParser()
+        return extractor.parse_eurovoc_descriptors(self.document_info_url)
 

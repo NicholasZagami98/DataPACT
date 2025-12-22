@@ -1,8 +1,8 @@
 import csv
 import os
 import re
-from eurlex_exporter import EURLexHTMLParser
-from iterator import DataIterator
+from service.eurlex_exporter import EURLexHTMLParser
+from service.iterator import DataIterator
 
 
 class CsvExporter:
@@ -32,6 +32,7 @@ class CsvExporter:
 
         if all_data:
             self._write_final_csv_files(all_data, output_dir)
+            print("CSV files generated successfully.")
 
         return all_data
 
@@ -99,8 +100,8 @@ class CsvExporter:
         iterator = DataIterator(all_data)
         rows = []
         for act, chapter, section, article in iterator.iter_articles():
-            rows.append([f"{act['celex']}{article['id']}", article['title']])
-        self._write_csv('articles.csv', ['article_id', 'title'], rows, output_dir)
+            rows.append([f"{act['celex']}{article['id']}", article['title'], article['full_text']])
+        self._write_csv('articles.csv', ['article_id', 'title', 'full_text'], rows, output_dir)
 
     def _write_paragraphs(self, all_data, output_dir):
         iterator = DataIterator(all_data)
@@ -183,7 +184,7 @@ class CsvExporter:
         for act, recital in iterator.iter_recitals():
             recital_id = f"{act['celex']}{recital['id']}"
             rows.append([recital_id, recital['text']])
-        self._write_csv('recitals.csv', ['recital_id', 'text'], rows, output_dir)
+        self._write_csv('recitals.csv', ['recital_id', 'full_text'], rows, output_dir)
 
     def _write_act_recital_relations(self, all_data, output_dir):
         iterator = DataIterator(all_data)

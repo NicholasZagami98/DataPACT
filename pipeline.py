@@ -1,5 +1,5 @@
 import os
-from csv_parser import CsvExporter
+from service.csv_parser import CsvExporter
 
 documents = [
     {

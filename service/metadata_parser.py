@@ -3,15 +3,12 @@ from bs4 import BeautifulSoup
 
 
 class MetadataParser:
-    def __init__(self, celex):
-        self.celex = celex
-
-    def parse_metadata(self):
+    def __init__(self):
         pass
 
-    def parse_eurovoc_descriptors(self):
+    def parse_eurovoc_descriptors(self, document_info_url):
         try:
-            doc_synthesis = requests.get("https://eur-lex.europa.eu/legal-content/EN/LSU/?uri=CELEX:32016R0679").text
+            doc_synthesis = requests.get(document_info_url).text
             soup = BeautifulSoup(doc_synthesis, 'html.parser')
             section = self.extract_div_by_specific_id(soup, "PPLinked_Contents")
             return self.extract_relationship_between_documents_section(section)
